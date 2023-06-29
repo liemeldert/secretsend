@@ -36,13 +36,13 @@ def purge_old_data():
 
 
 @app.get("/publicv1/{item_id}/")
-async def get_item(item_id: int, turnstyle_response: str = None):
+async def get_item(item_id: int, turnstile_response: str = None):
     
     validation = True
-    if not Config().turnstyle_disabled:
+    if not Config().turnstile_disabled:
         try:
-            ts_client = Turnstile(Config().turnstyle_sitekey, Config().turnstyle_secret)
-            validation = ts_client.validate_response(turnstyle_response)
+            ts_client = Turnstile(Config().turnstile_sitekey, Config().turnstile_secret)
+            validation = ts_client.validate_response(turnstile_response)
         except ValueError as e:
             if "secret" in e:
                 return status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -64,12 +64,12 @@ async def get_item(item_id: int, turnstyle_response: str = None):
 
 
 @app.post("/publicv1/")
-async def create_item(content: str, expiry_time: datetime, request: Request, turnstyle_response: str = None):
+async def create_item(content: str, expiry_time: datetime, request: Request, turnstile_response: str = None):
     validation = True
-    if not Config().turnstyle_disabled:
+    if not Config().turnstile_disabled:
         try:
-            ts_client = Turnstile(Config().turnstyle_sitekey, Config().turnstyle_secret)
-            validation = ts_client.validate_response(turnstyle_response)
+            ts_client = Turnstile(Config().turnstile_sitekey, Config().turnstile_secret)
+            validation = ts_client.validate_response(turnstile_response)
         except ValueError as e:
             if "secret" in e:
                 return status.HTTP_500_INTERNAL_SERVER_ERROR

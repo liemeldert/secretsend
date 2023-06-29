@@ -160,18 +160,22 @@ class Table:
                     return id
         raise Exception("Unable to generate a unique ID after 1000 attempts.")
 
-    def insert(self, data: Dict[str, Any], id_length: Optional[int] = None):
+    def insert(self, data: Dict[str, Any], id_length: Optional[int] = None) -> Optional[str]:
         """Insert a new record into the database."""
         if id_length is not None and self.primary_key == 'id':
             assert 'id' not in data, "When id_length is provided, 'id' should not be in data"
             unique_id = self._generate_unique_id(id_length)
             data['id'] = unique_id
-        query = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(
+        query = sql.SQL("INSERT INTO {} ({}) VALUES ({}) RETURNING {}").format(
             sql.Identifier(self.name),
             sql.SQL(', ').join(map(sql.Identifier, data.keys())),
-            sql.SQL(', ').join(sql.Placeholder() * len(data))
+            sql.SQL(', ').join(sql.Placeholder() * len(data)),
+            sql.Identifier(self.primary_key)
         )
-        self.db.execute_query(query, list(data.values()))
+        if self.db.execute_query(query, list(data.values())):
+            return unique_id if id_length is not None else data[self.primary_key]
+        return None
+
 
 
     def update(self, condition: str, params: tuple, column: str, value):

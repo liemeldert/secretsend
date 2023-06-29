@@ -35,7 +35,7 @@ async def get_item(item_id: int, turnstyle_response: str = None):
                 return status.HTTP_500_INTERNAL_SERVER_ERROR
             return status.HTTP_400_BAD_REQUEST, e
         if not validation:
-            return status.HTTP_403_FORBIDDE
+            return status.HTTP_403_FORBIDDEN
         
         item = db.items.get_pydantic_first(f'id = {item_id}')
         
@@ -52,7 +52,6 @@ async def get_item(item_id: int, turnstyle_response: str = None):
 
 @app.post("/publicv1/")
 async def create_item(content: str, expiry_time: datetime, request: Request, turnstyle_response: str = None):
-    
     validation = True
     if not Config().turnstyle_disabled:
         try:
@@ -64,23 +63,31 @@ async def create_item(content: str, expiry_time: datetime, request: Request, tur
             return status.HTTP_400_BAD_REQUEST, e
         if not validation:
             return status.HTTP_403_FORBIDDE
-        
     
+    # Check if the item is expired already
+    if expiry_time < datetime.now():
+        return status.HTTP_400_BAD_REQUEST, "Expiry time in the past"
+    
+    # Check if the item will expire after 30 days, the maximum allowed
+    if expiry_time > datetime.now() + timedelta(days=30):
+        return status.HTTP_400_BAD_REQUEST, "Expiry time too far in the future"
+
     client_ip = request.client.host
     if len(content) > 128:
         return status.HTTP_400_BAD_REQUEST, "Content too long"
     try:
-        db.items.insert({
-                            'content': content,
-                            'expiration': expiry_time,
-                            'created': datetime.now(),
-                            'source': client_ip,
-                        }, id_length=8)
+        new_item_id = db.items.insert({
+            'content': content,
+            'expiration': expiry_time,
+            'created': datetime.now(),
+            'source': client_ip,
+        }, id_length=8)
     except Exception as e:
         print(e)
         return status.HTTP_500_INTERNAL_SERVER_ERROR
-    
-    return 
+
+    return {"id": new_item_id}
+
 
 
 @app.get("/publicv1/tea")

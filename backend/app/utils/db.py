@@ -194,6 +194,12 @@ class Table:
             sql.SQL(condition)
         )
         self.db.execute_query(query, params)
+        
+    def delete_many(self, condition):
+        with self.db_connection.cursor() as cursor:
+            query = f"DELETE FROM {self.table_name} WHERE {condition}"
+            cursor.execute(query)
+            self.db_connection.commit()
 
     def get_item(self, condition: str, params: tuple) -> Optional['Row']:
         """Returns a Row object for the first record in the database that matches the given condition."""

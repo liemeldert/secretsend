@@ -3,12 +3,15 @@ from fastapi import FastAPI, status, Request
 from .utils.config import Config
 from .utils.db import DatabaseManager
 from .utils.turnstile import Turnstile
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 
 app = FastAPI()
 
 # Initialize the database manager
 db = DatabaseManager(dbname=Config().dbname, user=Config().dbuser, password=Config().dbpassword, host=Config().dbhost)
 
+scheduler = AsyncIOScheduler()
 
 @app.on_event("startup")
 async def startup_event():
@@ -20,6 +23,16 @@ async def startup_event():
                               'source': 'INET',
                               }
                     )
+    
+
+@app.on_event("startup")
+def start_scheduler():
+    scheduler.add_job(purge_old_data, "interval", hours=1)
+    scheduler.start()
+
+
+def purge_old_data():
+    db.items.delete_many({"expiration": {"$lt": datetime.now()}})
 
 
 @app.get("/publicv1/{item_id}/")

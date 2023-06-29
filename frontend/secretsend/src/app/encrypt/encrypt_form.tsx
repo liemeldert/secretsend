@@ -4,19 +4,22 @@ import { DateTimePicker } from '@mantine/dates';
 import { useForm } from '@mantine/form';
 import CryptoJS from 'crypto-js';
 import axios from 'axios';
+import Turnstile from 'react-turnstile';
 
 export default function Encrypt() {
   const [selected, setSelected] = useState('preview');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
-  const [timeType, setTimeType] = useState('date'); // Initialize timeType
+  const [timeType, setTimeType] = useState('date');
+  const [Token, setToken] = useState('');
 
   const form = useForm({
     initialValues: {
       password: '',
       termsOfService: false,
       expiryTime: '',
+      token: '',
     },
     onSubmit: async (values: { password: string; expiryTime: any; }) => {
       setLoading(true);
@@ -32,6 +35,7 @@ export default function Encrypt() {
           {
             content: encryptedPassword,
             expiry_time: values.expiryTime,
+            turnstile_response: Token,
           },
           {
             params: {
@@ -40,7 +44,7 @@ export default function Encrypt() {
           }
         );
 
-        setResult(`https://send.liem.zip/${response.data.id}/${key}`);
+        setResult(`https://send.liem.zip/get/${response.data.id}/${key}`);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -48,6 +52,7 @@ export default function Encrypt() {
       }
     },
   });
+
 
   const handleSelection = (value: string) => {
     setSelected(value);
@@ -105,6 +110,7 @@ export default function Encrypt() {
             {...form.getInputProps('expiryTime')}
           />
         )}
+        <Turnstile sitekey='' onVerify={(token) => setToken(token)} />
         <Checkbox
           mt="md"
           label="I agree to the Terms of Service and confirm that I will not use this application in violation of the law."

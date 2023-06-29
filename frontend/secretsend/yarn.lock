@@ -2474,6 +2474,11 @@ react-textarea-autosize@8.3.4:
     use-composed-ref "^1.3.0"
     use-latest "^1.2.1"
 
+react-turnstile@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/react-turnstile/-/react-turnstile-1.1.1.tgz#012ddce85e1a36abe37ea3de1cb8370c2ccd8ba0"
+  integrity sha512-oUxMFUKmYm655yqbGDreqshyMtzgNdpmeKprRGpEzsTfhE1lXO0MmSBpiRS+6TxXYxLEipwnS7vR9Q88dbeHWg==
+
 react@18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react/-/react-18.2.0.tgz#555bd98592883255fa00de14f1151a917b5d77d5"

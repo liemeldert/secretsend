@@ -11,8 +11,8 @@ class Config:
         self.dbpassword = os.environ.get('DB_PASSWORD')
         self.dbhost = os.environ.get('DB_HOST')
         # Turnstyle config
-        self.turnstyle_sitekey = os.environ.get('TURNSTYLE_SITEKEY')
-        self.turnstyle_secret = os.environ.get('TURNSTYLE_SECRET')
-        self.turnstyle_disabled = bool(os.environ.get('TURNSTYLE_DISABLED', False))
+        self.turnstile_sitekey = os.environ.get('TURNSTYLE_SITEKEY')
+        self.turnstile_secret = os.environ.get('TURNSTYLE_SECRET')
+        self.turnstile_disabled = bool(os.environ.get('TURNSTYLE_DISABLED', False))
         
         print("db_host = " + str(self.dbhost))

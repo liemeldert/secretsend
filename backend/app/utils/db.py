@@ -1,13 +1,13 @@
 #  -- I can't believe it's not ORM! --
 # --- Just like a real ORM but worse ---
-import psycopg2 as psycopg2
+# XKCD 327: Exploits of a Mom
+import psycopg2
 import logging
 import string
 import random
 from psycopg2 import sql, Error
-from datetime import datetime
 from pydantic import BaseModel
-from typing import Any, List, Type, Optional, Dict, Union
+from typing import Any, List, Type, Optional, Dict
 
 def generate_random_string(length: int) -> str:
     """Generate a random string of the specified length."""
@@ -125,6 +125,8 @@ class Table:
         if results:
             return results[0]
         return None
+
+    # TODO: Replace get_pydantic and get_first pydantic with method on row level
 
     def get_pydantic(self, condition: str, params: tuple, model: Type[BaseModel]) -> List[BaseModel]:
         """Returns a list of Pydantic models for all records in the database that match the given condition."""

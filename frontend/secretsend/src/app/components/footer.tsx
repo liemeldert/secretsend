@@ -136,14 +136,14 @@ export function FooterLinks({ data }: FooterLinksProps) {
         <div className={classes.logo}>
           <Logo />
           <Text size="xs" color="dimmed" className={classes.description}>
-            Build fully functional accessible web applications faster than ever
+            Simple and secure password sharing.
           </Text>
         </div>
         <div className={classes.groups}>{groups}</div>
       </Container>
       <Container className={classes.afterFooter}>
         <Text color="dimmed" size="sm">
-          © 2023 Liem Eldert. All rights reserved.
+          © 2023 Liem Eldert. All rights reserved. 
         </Text>
 
         <Group spacing={0} className={classes.social} position="right" noWrap>

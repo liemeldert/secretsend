@@ -1,0 +1,82 @@
+import pytest
+from unittest import mock
+from unittest.mock import MagicMock, call
+from ..utils.db import ComplexDatabaseManager, DatabaseManager, Table, Row
+
+# Mock psycopg2 module
+psycopg2 = mock.MagicMock()
+
+
+def test_complexdatabasemanager_init():
+    with mock.patch('your_module.psycopg2.connect') as mock_connect:
+        manager = ComplexDatabaseManager('test_db', 'user', 'pass')
+        assert manager.conn is not None
+        assert manager.cursor is not None
+        mock_connect.assert_called_once_with(dbname='test_db', user='user', password='pass', host='localhost')
+
+
+def test_complexdatabasemanager_close():
+    with mock.patch('your_module.psycopg2.connect') as mock_connect:
+        manager = ComplexDatabaseManager('test_db', 'user', 'pass')
+        manager.cursor = mock.MagicMock()
+        manager.conn = mock.MagicMock()
+        manager.close()
+        manager.cursor.close.assert_called_once()
+        manager.conn.close.assert_called_once()
+
+
+def test_table_get():
+    manager = ComplexDatabaseManager('test_db', 'user', 'pass')
+    table = Table(manager, 'test_table')
+    with mock.patch.object(manager, 'read_query', return_value=[{'id': 1, 'name': 'test'}]) as mock_read_query:
+        result = table.get("id = %s", (1,))
+        assert result == [{'id': 1, 'name': 'test'}]
+
+
+def test_table_insert():
+    manager = ComplexDatabaseManager('test_db', 'user', 'pass')
+    table = Table(manager, 'test_table')
+    with mock.patch.object(manager, 'execute_query', return_value=True) as mock_execute_query:
+        table.insert({'name': 'test'})
+        mock_execute_query.assert_called()
+
+
+def test_table_update():
+    manager = ComplexDatabaseManager('test_db', 'user', 'pass')
+    table = Table(manager, 'test_table')
+    with mock.patch.object(manager, 'execute_query', return_value=True) as mock_execute_query:
+        table.update("id = %s", (1,), 'name', 'updated_test')
+        mock_execute_query.assert_called()
+
+
+def test_table_delete():
+    manager = ComplexDatabaseManager('test_db', 'user', 'pass')
+    table = Table(manager, 'test_table')
+    with mock.patch.object(manager, 'execute_query', return_value=True) as mock_execute_query:
+        table.delete("id = %s", (1,))
+        mock_execute_query.assert_called()
+
+
+def test_row_update():
+    manager = ComplexDatabaseManager('test_db', 'user', 'pass')
+    table = Table(manager, 'test_table')
+    row = Row(id=1, name='test', table=table)
+    with mock.patch.object(table, 'update') as mock_update:
+        row.update('name', 'updated_test')
+        mock_update.assert_called_once_with('name', 'updated_test')
+
+
+def test_row_delete():
+    manager = ComplexDatabaseManager('test_db', 'user', 'pass')
+    table = Table(manager, 'test_table')
+    row = Row(id=1, name='test', table=table)
+    with mock.patch.object(table, 'delete') as mock_delete:
+        row.delete()
+        mock_delete.assert_called_once_with('id = %s', (1,))
+
+
+def test_DatabaseManager_create_table():
+    manager = DatabaseManager('test_db', 'user', 'pass')
+    with mock.patch.object(manager, 'execute_query', return_value=True) as mock_execute_query:
+        manager.create_table('test_table', {'id': 'SERIAL PRIMARY KEY', 'name': 'VARCHAR(100)'})
+        mock_execute_query.assert_called()

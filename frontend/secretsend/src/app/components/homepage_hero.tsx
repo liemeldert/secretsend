@@ -1,5 +1,6 @@
 import { createStyles, Title, Text, Button, Container, rem } from '@mantine/core';
 import { Dots } from './Dots';
+import Link from 'next/link';
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -118,9 +119,11 @@ export function HomepageHero() {
         </Container>
 
         <div className={classes.controls}>
-          <Button className={classes.control} size="lg" onClick={() => scrollTo({ y: 700 })}>
-            Send a password
-          </Button>
+          <Link href="#send">
+              <Button className={classes.control} size="lg">
+                Send a password
+              </Button>
+          </Link>
         </div>
       </div>
     </Container>

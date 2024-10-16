@@ -2,3 +2,6 @@ psycopg2-binary~=2.9.6
 pydantic~=1.10.9
 fastapi~=0.98
 uvicorn~=0.17
+python-dotenv~=1.0.1
+beanie~=1.26.0
+APScheduler~=3.10.4

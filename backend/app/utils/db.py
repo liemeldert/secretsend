@@ -9,10 +9,12 @@ from psycopg2 import sql, Error
 from pydantic import BaseModel
 from typing import Any, List, Type, Optional, Dict
 
+
 def generate_random_string(length: int) -> str:
     """Generate a random string of the specified length."""
     characters = string.ascii_uppercase + string.digits
     return ''.join(random.choice(characters) for _ in range(length))
+
 
 class ComplexDatabaseManager:
     """A complex database manager that provides low-level access to a PostgreSQL database."""
@@ -20,12 +22,7 @@ class ComplexDatabaseManager:
         self.conn = None
         self.cursor = None
         try:
-            self.conn = psycopg2.connect(
-                dbname=dbname,
-                user=user,
-                password=password,
-                host=host
-            )
+            self.conn = self.connect(dbname, user, password, host)
             self.cursor = self.conn.cursor()
         except Error as e:
             logging.error(f"Error {e.pgcode}: {e.pgerror}")
@@ -37,6 +34,14 @@ class ComplexDatabaseManager:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
+        
+    def connect(self, dbname, user, password, host='localhost'):
+        return psycopg2.connect(
+            dbname=dbname,
+            user=user,
+            password=password,
+            host=host
+        )
 
     def close(self):
         """Close the database connection."""
@@ -177,8 +182,6 @@ class Table:
         if self.db.execute_query(query, list(data.values())):
             return unique_id if id_length is not None else data[self.primary_key]
         return None
-
-
 
     def update(self, condition: str, params: tuple, column: str, value):
         """Update a record in the database."""
